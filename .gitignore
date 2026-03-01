@@ -1,0 +1,29 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# Environment Variables (Security)
+.env
+
+# Large Data Files (GitHub has a 100MB limit, so we block the CSVs)
+data/raw/*.csv
+data/processed/*.csv
+
+# Pytest caches
+.pytest_cache/
+
+# IDE and OS specific files
+.vscode/
+.idea/
+.DS_Store
+
+# ---------------------------------------------------------------------------
+# EXCEPTION: mlruns/ is intentionally NOT ignored here!
+# The assignment requires pushing the experiment history to GitHub.
+# ---------------------------------------------------------------------------
