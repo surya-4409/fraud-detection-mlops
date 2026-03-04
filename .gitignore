@@ -12,8 +12,6 @@ env/
 .env
 
 # Large Data Files (GitHub has a 100MB limit, so we block the CSVs)
-data/raw/*.csv
-data/processed/*.csv
 
 # Pytest caches
 .pytest_cache/
