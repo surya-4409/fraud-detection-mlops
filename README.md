@@ -1,49 +1,112 @@
 
+```markdown
 # Real-Time Fraud Detection System
 
 **Author:** Billakurti Venkata Suryanarayana  
 **Roll Number:** 23MH1A4409  
 
-## Project Overview
+## 🎥 Video Demonstration
+**[Watch the Project Walkthrough & API Demo Here](INSERT_YOUR_YOUTUBE_OR_DRIVE_LINK_HERE)**
+
+---
+
+## 📌 Project Overview
 This repository contains a production-ready, real-time machine learning pipeline for credit card fraud detection. It encapsulates the complete ML lifecycle, from handling heavily imbalanced data (using SMOTE) to deploying an optimized XGBoost model via a FastAPI REST interface, all containerized within Docker.
 
-## System Architecture
+## 🏗️ System Architecture
 * **Modeling:** XGBoost, Scikit-Learn, Imbalanced-Learn (SMOTE)
 * **Experiment Tracking:** MLflow
 * **API Framework:** FastAPI, Uvicorn, Pydantic (Data Validation)
 * **Deployment:** Multi-stage Docker Build
-* **Testing:** Pytest
+* **Testing:** Pytest (Requests)
 
-## Setup Instructions
+---
 
-### 1. Local Development Setup
-Ensure you have Python 3.8+ installed.
+## ⚙️ Prerequisites: Dataset Setup
+This project uses the standard Credit Card Fraud Detection dataset from Kaggle. Because of its large size (150MB+), it is not included in this repository. 
+
+**Before running any training commands, you must download the dataset:**
+1. Download the dataset from Kaggle: [Credit Card Fraud Detection Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+2. Extract the downloaded archive.
+3. Place the `creditcard.csv` file inside the `data/raw/` directory of this project.
+
+*(Ensure the path is exactly: `data/raw/creditcard.csv`)*
+
+---
+
+## 🚀 Step-by-Step Execution Guide
+
+### Step 1: Clone the Repository
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the training pipeline (tracks via MLflow)
-python src/train.py
-
-# Start the API locally
-uvicorn api.main:app --reload
+git clone [https://github.com/surya-4409/fraud-detection-mlops.git](https://github.com/surya-4409/fraud-detection-mlops.git)
+cd fraud-detection-mlops
 
 ```
 
-### 2. Docker Deployment (Production)
+### Step 2: Setup Local Environment
+
+Ensure you have Python 3.8+ installed. Create a virtual environment and install the required dependencies:
 
 ```bash
-# Build the optimized multi-stage image
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+pip install -r requirements.txt
+
+```
+
+### Step 3: Data Preparation & Model Training
+
+First, process the raw dataset to engineer features and split the data. Then, train the ML models (tracked via MLflow).
+
+```bash
+# 1. Prepare data (Engineers features and creates train.csv / test_data.csv)
+python src/prepare_data.py
+
+# 2. Train models and select the best one based on PR-AUC
+python src/train.py
+
+```
+
+*To view the MLflow UI and experiment logs, run `mlflow ui` and visit `http://127.0.0.1:5000`.*
+
+### Step 4: Docker Deployment (Production API)
+
+Build the highly optimized, multi-stage Docker image and start the containerized FastAPI server:
+
+```bash
+# Build the production image
 docker build -t fraud-detection-api:latest .
 
-# Run the container
+# Run the container in the background
 docker run -d -p 8000:8000 fraud-detection-api:latest
 
 ```
 
-## API Usage Example
+### Step 5: Automated Testing
 
-To make a real-time prediction, send a POST request to the `/predict` endpoint.
+Verify the live API functionality, input validation, and latency (p95 < 100ms) by running the Pytest suite against the Docker container:
+
+```bash
+pytest tests/test_api.py -v -s
+
+```
+
+---
+
+## 🤖 Automated Evaluation (`submission.yml`)
+
+For automated CI/CD or evaluation environments, the entire pipeline is mapped in the `submission.yml` file. Evaluators can execute the following commands in sequence (assuming the dataset has been placed in `data/raw/`):
+
+1. **Setup:** `pip install -r requirements.txt`
+2. **Train:** `python src/prepare_data.py && python src/train.py`
+3. **Start API:** `docker build -t fraud-detection-api:latest . && docker run -d -p 8000:8000 fraud-detection-api:latest`
+4. **Test API:** `pytest tests/test_api.py -v -s`
+
+---
+
+## 🌐 API Usage Example
+
+Once the Docker container is running, you can make a real-time prediction by sending a `POST` request to the `/predict` endpoint.
 
 **cURL Request:**
 
@@ -63,7 +126,7 @@ curl -X 'POST' \
 
 ```
 
-**Response:**
+**Expected JSON Response:**
 
 ```json
 {
@@ -73,11 +136,5 @@ curl -X 'POST' \
 
 ```
 
-## Running Tests
-
-To verify functionality, validation, and API latency (<100ms):
-
-```bash
-pytest tests/test_api.py -v -s
-
 ```
+

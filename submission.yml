@@ -1,5 +1,4 @@
-
 setup: "pip install -r requirements.txt"
-train: "python src/train.py"
-start-api: "docker run -d -p 8000:8000 fraud-detection-api:latest"
+train: "python src/prepare_data.py && python src/train.py"
+start-api: "docker build -t fraud-detection-api:latest . && docker run -d -p 8000:8000 fraud-detection-api:latest"
 test-api: "pytest tests/test_api.py -v -s"

@@ -1,14 +1,27 @@
 import time
 import pytest
-from fastapi.testclient import TestClient
-from api.main import app
+import requests
 
-# Create a fixture for the test client. 
-# Using the 'with' statement ensures FastAPI triggers the "startup" event to load our model!
-@pytest.fixture(scope="module")
-def client():
-    with TestClient(app) as c:
-        yield c
+# Point directly to the live Docker container port
+BASE_URL = "http://127.0.0.1:8000"
+
+# Fixture to wait for the Docker container to be ready before running tests
+@pytest.fixture(scope="session", autouse=True)
+def wait_for_api():
+    """Pings the health endpoint until the API is live, or times out."""
+    max_retries = 10
+    delay = 1  # second
+    
+    for _ in range(max_retries):
+        try:
+            response = requests.get(f"{BASE_URL}/health")
+            if response.status_code == 200:
+                return  # API is ready!
+        except requests.exceptions.ConnectionError:
+            pass
+        time.sleep(delay)
+    
+    pytest.fail("Docker API did not start in time.")
 
 # A valid transaction payload based on normal credit card data
 VALID_PAYLOAD = {
@@ -23,16 +36,15 @@ VALID_PAYLOAD = {
     "Amount": 149.62
 }
 
-# Notice we now pass 'client' into every test function
-def test_health_check(client):
+def test_health_check():
     """Test if the API is running and model is loaded."""
-    response = client.get("/health")
+    response = requests.get(f"{BASE_URL}/health")
     assert response.status_code == 200
     assert response.json() == {"status": "API is running and model is loaded."}
 
-def test_predict_success(client):
+def test_predict_success():
     """Test if a valid payload returns a successful prediction."""
-    response = client.post("/predict", json=VALID_PAYLOAD)
+    response = requests.post(f"{BASE_URL}/predict", json=VALID_PAYLOAD)
     assert response.status_code == 200
     data = response.json()
     assert "is_fraud" in data
@@ -40,31 +52,31 @@ def test_predict_success(client):
     assert isinstance(data["is_fraud"], bool)
     assert isinstance(data["probability"], float)
 
-def test_predict_validation_error(client):
+def test_predict_validation_error():
     """Test if Pydantic properly catches missing fields."""
     invalid_payload = VALID_PAYLOAD.copy()
     del invalid_payload["Amount"]  # Remove a required field
 
-    response = client.post("/predict", json=invalid_payload)
+    response = requests.post(f"{BASE_URL}/predict", json=invalid_payload)
     assert response.status_code == 422  # Unprocessable Entity
     assert "detail" in response.json()
 
-def test_predict_type_error(client):
+def test_predict_type_error():
     """Test if Pydantic catches wrong data types."""
     invalid_payload = VALID_PAYLOAD.copy()
     invalid_payload["Amount"] = "one hundred"  # String instead of float
 
-    response = client.post("/predict", json=invalid_payload)
+    response = requests.post(f"{BASE_URL}/predict", json=invalid_payload)
     assert response.status_code == 422
 
-def test_latency_p95(client):
+def test_latency_p95():
     """Simulate load and ensure 95th percentile latency is under 100ms."""
     num_requests = 100
     latencies = []
 
     for _ in range(num_requests):
         start_time = time.perf_counter()
-        response = client.post("/predict", json=VALID_PAYLOAD)
+        response = requests.post(f"{BASE_URL}/predict", json=VALID_PAYLOAD)
         end_time = time.perf_counter()
         
         assert response.status_code == 200

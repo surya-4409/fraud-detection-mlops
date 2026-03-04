@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/surya/GPP/fraud_detection_project/mlruns/203544345532462299/1c188ea8538748c4b84e09f257673a8c/artifacts
+end_time: 1772637733349
+entry_point_name: ''
+experiment_id: '203544345532462299'
+lifecycle_stage: active
+run_id: 1c188ea8538748c4b84e09f257673a8c
+run_name: XGBoost
+run_uuid: 1c188ea8538748c4b84e09f257673a8c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1772637697660
+status: 3
+tags: []
+user_id: surya

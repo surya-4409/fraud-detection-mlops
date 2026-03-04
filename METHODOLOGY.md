@@ -11,7 +11,7 @@ To provide the models with stronger predictive signals, three new features were 
 
 ## 3. Handling Class Imbalance
 To address the 99.8% vs 0.17% class imbalance, the Synthetic Minority Over-sampling Technique (SMOTE) was applied. 
-* **Crucial MLOps Practice**: The dataset was split into an 80/20 train/test split *before* applying SMOTE. SMOTE was only applied to the training set to prevent data leakage and ensure the model was evaluated on strictly unseen, real-world data.
+* **Crucial MLOps Practice**: The dataset was split into an 80/20 train/test split using **stratification** to maintain the exact fraud ratio in both sets. *Then*, SMOTE was only applied to the training set within the cross-validation pipeline to prevent data leakage and ensure the model was evaluated on strictly unseen, real-world data.
 
 ## 4. Model Selection and Evaluation
 Two models were trained and tracked using MLflow:
