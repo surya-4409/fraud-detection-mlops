@@ -1,5 +1,4 @@
 
-```markdown
 # Real-Time Fraud Detection System
 
 **Author:** Billakurti Venkata Suryanarayana  
