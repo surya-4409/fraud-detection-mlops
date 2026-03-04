@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/surya/GPP/fraud_detection_project/mlruns/382043780666738477/ad2719974a594f8ab48951e9b6996778/artifacts
+end_time: 1772616406319
+entry_point_name: ''
+experiment_id: '382043780666738477'
+lifecycle_stage: active
+run_id: ad2719974a594f8ab48951e9b6996778
+run_name: Logistic_Regression
+run_uuid: ad2719974a594f8ab48951e9b6996778
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1772616265366
+status: 3
+tags: []
+user_id: surya
